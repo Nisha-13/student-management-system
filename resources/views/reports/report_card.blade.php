@@ -111,7 +111,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="text-end my-3 no-print d-flex justify-content-end align-items-center gap-2">
+        <div class="text-end my-3 no-print d-flex flex-wrap justify-content-end align-items-center gap-2">
             <button type="button" onclick="downloadPDF()" class="btn btn-success rounded-pill px-4 fw-semibold">
                 <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download PDF
             </button>
@@ -128,7 +128,7 @@
 
         <div id="reportCardContent" class="report-card-container">
             <!-- Header -->
-            <div class="report-header d-flex justify-content-between align-items-center">
+            <div class="report-header d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div class="d-flex align-items-center gap-3">
                     <i class="bi bi-mortarboard-fill header-logo"></i>
                     <div>
@@ -252,20 +252,20 @@
             </div>
 
             <!-- Authentic Signatures & Seal Section -->
-            <div class="row text-center mt-5 pt-4 border-top align-items-end">
-                <div class="col-4">
+            <div class="row text-center mt-5 pt-4 border-top align-items-end g-4">
+                <div class="col-12 col-sm-4">
                     <div class="signature-box mb-2" style="min-height: 45px;">
                         <span class="signature-script-1">Sarah Connor</span>
                     </div>
                     <div class="border-top border-secondary w-75 mx-auto pt-1 small fw-semibold text-muted">Class Teacher Signature</div>
                 </div>
-                <div class="col-4">
+                <div class="col-12 col-sm-4">
                     <div class="signature-box mb-2" style="min-height: 45px;">
                         <span class="signature-script-2">Dr. Robert Ford</span>
                     </div>
                     <div class="border-top border-secondary w-75 mx-auto pt-1 small fw-semibold text-muted">Principal Signature</div>
                 </div>
-                <div class="col-4">
+                <div class="col-12 col-sm-4">
                     <div class="official-seal">
                         <i class="bi bi-patch-check-fill fs-6 text-primary"></i>
                         <span>SEAL</span>

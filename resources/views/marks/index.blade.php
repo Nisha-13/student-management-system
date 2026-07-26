@@ -8,7 +8,7 @@
     <h5 class="fw-bold mb-3"><i class="bi bi-funnel text-success me-2"></i> Select Class, Subject & Exam</h5>
 
     <form id="marksFilterForm" class="row g-3 align-items-end">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label fw-semibold small text-muted">Class *</label>
             <select id="classFilter" class="form-select" required>
                 <option value="">Select Class</option>
@@ -18,14 +18,14 @@
             </select>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label fw-semibold small text-muted">Subject *</label>
             <select id="subjectFilter" class="form-select" required>
                 <option value="">Select Subject</option>
             </select>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label fw-semibold small text-muted">Exam Title *</label>
             <div class="input-group">
                 <input type="text" id="examFilter" class="form-control" placeholder="e.g. Midterm 2026" value="Midterm Exam" required>
@@ -44,15 +44,15 @@
     </div>
 
     <form id="marksSubmitForm">
-        <div class="table-responsive mb-4">
+        <div class="table-responsive mb-4 marks-table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 15%;">Roll #</th>
-                        <th style="width: 25%;">Student Name</th>
-                        <th style="width: 20%;">Marks Obtained *</th>
-                        <th style="width: 20%;">Max Marks *</th>
-                        <th style="width: 20%;">Remarks</th>
+                        <th>Roll #</th>
+                        <th>Student Name</th>
+                        <th>Marks Obtained *</th>
+                        <th class="d-none d-sm-table-cell">Max Marks *</th>
+                        <th class="d-none d-md-table-cell">Remarks</th>
                     </tr>
                 </thead>
                 <tbody id="marksTbody">
@@ -139,10 +139,10 @@ $(document).ready(function() {
                                         <input type="number" step="0.01" min="0" max="${maxVal}" name="marks[${index}][marks_obtained]" class="form-control marks-obtained-input" value="${student.marks_obtained}" placeholder="e.g. 85.5" required>
                                         <div class="invalid-feedback small">Must not exceed max marks</div>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-sm-table-cell">
                                         <input type="number" step="0.01" min="1" name="marks[${index}][max_marks]" class="form-control max-marks-input" value="${maxVal}" required>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         <input type="text" name="marks[${index}][remarks]" class="form-control" placeholder="Optional remark" value="${student.remarks || ''}">
                                     </td>
                                 </tr>
@@ -191,7 +191,7 @@ $(document).ready(function() {
             var obtainedInput = $(this).find('.marks-obtained-input');
             var maxInput = $(this).find('.max-marks-input');
             var obtained = parseFloat(obtainedInput.val());
-            var max = parseFloat(maxInput.val());
+            var max = maxInput.length ? parseFloat(maxInput.val()) : parseFloat(obtainedInput.attr('max')) || 100;
 
             if (!isNaN(obtained) && !isNaN(max) && obtained > max) {
                 obtainedInput.addClass('is-invalid');

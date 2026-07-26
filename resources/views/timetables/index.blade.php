@@ -7,7 +7,7 @@
 <div id="timetableAlertContainer"></div>
 
 <div class="card card-custom p-4 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <h5 class="fw-bold m-0"><i class="bi bi-calendar3 text-primary me-2"></i> Class Timetable Filter</h5>
         <button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#addSlotModal">
             <i class="bi bi-plus-lg me-1"></i> Add Period Slot
@@ -15,7 +15,7 @@
     </div>
 
     <form id="timetableFilterForm" class="row g-3 align-items-end">
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
             <label class="form-label fw-semibold small text-muted">Class *</label>
             <select id="classFilter" class="form-select" required>
                 <option value="">Select Class</option>
@@ -25,14 +25,14 @@
             </select>
         </div>
 
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
             <label class="form-label fw-semibold small text-muted">Section *</label>
             <select id="sectionFilter" class="form-select" required>
                 <option value="">Select Section</option>
             </select>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <button type="submit" id="viewScheduleBtn" class="btn btn-success w-100 fw-semibold">
                 <i class="bi bi-search me-1"></i> View Schedule
             </button>
@@ -77,7 +77,7 @@
                     <div id="slotModalAlertError" class="alert alert-danger d-none mb-3"></div>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
+                        <div class="col-12 col-sm-6">
                             <label class="form-label fw-semibold small text-muted">Class *</label>
                             <select name="school_class_id" id="modalClassSelect" class="form-select" required>
                                 <option value="">Select Class</option>
@@ -86,7 +86,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-sm-6">
                             <label class="form-label fw-semibold small text-muted">Section *</label>
                             <select name="section_id" id="modalSectionSelect" class="form-select" required>
                                 <option value="">Select Section</option>
@@ -95,13 +95,13 @@
                     </div>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
+                        <div class="col-12 col-sm-6">
                             <label class="form-label fw-semibold small text-muted">Subject *</label>
                             <select name="subject_id" id="modalSubjectSelect" class="form-select" required>
                                 <option value="">Select Subject</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-sm-6">
                             <label class="form-label fw-semibold small text-muted">Assigned Teacher *</label>
                             <select name="teacher_id" class="form-select" required>
                                 <option value="">Select Teacher</option>
@@ -113,7 +113,7 @@
                     </div>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-4">
+                        <div class="col-12 col-sm-4">
                             <label class="form-label fw-semibold small text-muted">Day of Week *</label>
                             <select name="day_of_week" class="form-select" required>
                                 @foreach($days as $day)
@@ -121,11 +121,11 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-6 col-sm-4">
                             <label class="form-label fw-semibold small text-muted">Start Time *</label>
                             <input type="time" name="start_time" class="form-control" value="09:00" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-6 col-sm-4">
                             <label class="form-label fw-semibold small text-muted">End Time *</label>
                             <input type="time" name="end_time" class="form-control" value="10:00" required>
                         </div>
@@ -224,7 +224,7 @@ $(document).ready(function() {
                     }
 
                     var badgeHtml = `
-                        <div class="badge-period card d-inline-block border-primary me-2 mb-2 p-2 shadow-sm text-start" style="min-width: 190px;">
+                        <div class="badge-period card d-inline-block border-primary me-2 mb-2 p-2 shadow-sm text-start">
                             <div class="fw-bold text-primary">${slot.subject.name}</div>
                             <div class="small text-dark"><i class="bi bi-clock me-1"></i> ${slot.start_time} - ${slot.end_time}</div>
                             <div class="small text-muted"><i class="bi bi-person me-1"></i> ${slot.teacher.user.name}</div>

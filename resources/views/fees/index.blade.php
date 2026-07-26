@@ -6,19 +6,47 @@
 @section('content')
 <div id="feeAlertContainer"></div>
 
-<div class="card card-custom p-4 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h5 class="fw-bold m-0">Fee Management</h5>
-            <small class="text-muted">Generate fee demands, track payments, and review balances</small>
-        </div>
-        <button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#createFeeModal">
-            <i class="bi bi-plus-lg me-1"></i> Generate Fee Demand
-        </button>
-    </div>
+<div class="card card-custom shadow-sm border-0">
 
-    <div class="table-responsive">
-        <table id="feesTable" class="table table-hover align-middle w-100">
+    <div class="card-body p-3 p-md-4">
+
+        <!-- Header -->
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+            <div>
+
+                <h4 class="fw-bold mb-1">
+                    Fee Management
+                </h4>
+
+                <small class="text-muted">
+                    Generate fee demands, track payments and review balances
+                </small>
+
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-primary rounded-pill px-4 add-fee-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#createFeeModal">
+
+                <i class="bi bi-plus-lg me-1"></i>
+
+                Generate Fee Demand
+
+            </button>
+
+        </div>
+
+        <!-- Table -->
+
+        <div class="table-responsive fees-table-wrapper">
+
+            <table
+                id="feesTable"
+                class="table table-hover align-middle w-100">
             <thead class="table-light">
                 <tr>
                     <th>Roll #</th>
@@ -34,8 +62,12 @@
                 </tr>
             </thead>
             <tbody></tbody>
-        </table>
+                </table>
+
+        </div>
+
     </div>
+
 </div>
 
 <!-- Modal: Generate Fee Demand -->
@@ -68,11 +100,11 @@
                     </div>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
+                        <div class="col-12 col-sm-6">
                             <label class="form-label fw-semibold small text-muted">Amount ($) *</label>
                             <input type="number" step="0.01" min="0" name="amount" class="form-control" placeholder="500.00" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-sm-6">
                             <label class="form-label fw-semibold small text-muted">Due Date *</label>
                             <input type="date" name="due_date" class="form-control" value="{{ date('Y-m-d', strtotime('+30 days')) }}" required>
                         </div>
@@ -119,120 +151,702 @@
 </div>
 @endsection
 
+@push('styles')
+
+<style>
+
+.card-custom{
+
+    border-radius:16px;
+
+}
+
+/*--------------------------------------------------------------
+# Button
+--------------------------------------------------------------*/
+
+.add-fee-btn{
+
+    white-space:nowrap;
+
+}
+
+@media(max-width:767px){
+
+.add-fee-btn{
+
+    width:100%;
+
+}
+
+}
+
+/*--------------------------------------------------------------
+# Table
+--------------------------------------------------------------*/
+
+.fees-table-wrapper{
+
+    overflow-x:auto;
+
+    overflow-y:hidden;
+
+    -webkit-overflow-scrolling:touch;
+
+}
+
+#feesTable{
+
+    width:100%!important;
+
+    min-width:1000px;
+
+    table-layout:auto;
+
+}
+
+#feesTable thead th{
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+}
+
+#feesTable td{
+
+    white-space:nowrap;
+
+    vertical-align:middle;
+
+}
+
+/* Action Column */
+
+#feesTable th:last-child,
+#feesTable td:last-child{
+
+    min-width:150px;
+
+    text-align:center;
+
+    white-space:nowrap;
+
+}
+
+/*--------------------------------------------------------------
+# Modal
+--------------------------------------------------------------*/
+
+.modal .form-control,
+.modal .form-select{
+
+    font-size:.95rem;
+
+}
+
+.modal .form-label{
+
+    margin-bottom:.35rem;
+
+}
+
+/*--------------------------------------------------------------
+# Scrollbar
+--------------------------------------------------------------*/
+
+.fees-table-wrapper::-webkit-scrollbar{
+
+    height:8px;
+
+}
+
+.fees-table-wrapper::-webkit-scrollbar-thumb{
+
+    background:#c8c8c8;
+
+    border-radius:10px;
+
+}
+
+.fees-table-wrapper::-webkit-scrollbar-track{
+
+    background:#efefef;
+
+}
+
+/*--------------------------------------------------------------
+# Mobile
+--------------------------------------------------------------*/
+
+@media(max-width:576px){
+
+.card-custom h4{
+
+    font-size:1.1rem;
+
+}
+
+.card-custom h5{
+
+    font-size:1.05rem;
+
+}
+
+.card-custom small{
+
+    font-size:.80rem;
+
+}
+
+#feesTable th,
+#feesTable td{
+
+    font-size:.86rem;
+
+    padding:.55rem;
+
+}
+
+.modal-dialog{
+
+    margin:.75rem;
+
+}
+
+.modal-footer{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:.5rem;
+
+}
+
+.modal-footer .btn{
+
+    width:100%;
+
+}
+
+}
+
+/*--------------------------------------------------------------
+# Tablet
+--------------------------------------------------------------*/
+
+@media(min-width:577px) and (max-width:991px){
+
+#feesTable th,
+#feesTable td{
+
+    font-size:.92rem;
+
+}
+
+}
+
+</style>
+
+@endpush
+
 @push('scripts')
 <script>
-$(document).ready(function() {
-    var table = $('#feesTable').DataTable({
-        processing: true,
-        ajax: "{{ route('fees.index') }}",
-        columns: [
-            { data: 'roll_number' },
-            { data: 'student_name', render: function(d) { return '<span class="fw-semibold">' + d + '</span>'; } },
-            { data: 'class_section' },
-            { data: 'title' },
-            { data: 'amount' },
-            { data: 'paid_amount' },
-            { data: 'due_balance', render: function(d) { return '<span class="text-danger fw-semibold">' + d + '</span>'; } },
-            { data: 'due_date' },
-            { data: 'status' },
-            { data: 'actions', orderable: false, searchable: false }
-        ]
+
+$(function () {
+
+
+    $.ajaxSetup({
+
+        headers: {
+
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+
+        }
+
     });
 
-    function showAlert(message, type = 'success') {
-        var alertHtml = `
-            <div class="alert alert-${type} alert-dismissible fade show card-custom mb-4" role="alert">
-                <i class="bi ${type === 'success' ? 'bi-check-circle-fill text-success' : 'bi-exclamation-triangle-fill text-danger'} me-2 fs-5"></i>
-                <strong>${message}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+
+
+    const table = $('#feesTable').DataTable({
+
+        processing: true,
+
+        responsive:false,
+
+        scrollX:true,
+
+        autoWidth:false,
+
+        deferRender:true,
+
+
+        ajax:"{{ route('fees.index') }}",
+
+
+        columns:[
+
+
+            {data:'roll_number'},
+
+
+            {
+                data:'student_name',
+
+                render:function(data){
+
+                    return `<span class="fw-semibold">${data}</span>`;
+
+                }
+
+            },
+
+
+            {data:'class_section'},
+
+
+            {data:'title'},
+
+
+            {data:'amount'},
+
+
+            {data:'paid_amount'},
+
+
+            {
+
+                data:'due_balance',
+
+                render:function(data){
+
+                    return `<span class="text-danger fw-semibold">${data}</span>`;
+
+                }
+
+            },
+
+
+            {data:'due_date'},
+
+
+            {data:'status'},
+
+
+            {
+
+                data:'actions',
+
+                orderable:false,
+
+                searchable:false,
+
+                className:'text-center'
+
+            }
+
+
+        ],
+
+
+        pageLength:10,
+
+
+        order:[[0,'asc']],
+
+
+        language:{
+
+
+            search:"_INPUT_",
+
+            searchPlaceholder:"Search fee records...",
+
+
+            lengthMenu:"Show _MENU_ records",
+
+
+            info:"Showing _START_ to _END_ of _TOTAL_ records",
+
+
+            zeroRecords:"No matching records found",
+
+
+            emptyTable:"No fee records available"
+
+
+        },
+
+
+        initComplete:function(){
+
+            this.api().columns.adjust();
+
+        }
+
+
+    });
+
+
+
+
+
+    $(window).on('resize', function(){
+
+        table.columns.adjust();
+
+    });
+
+
+
+
+
+    function showAlert(message,type='success'){
+
+
+        let html=`
+
+
+        <div class="alert alert-${type} alert-dismissible fade show mb-4">
+
+
+            <i class="bi ${type==='success'
+            ?'bi-check-circle-fill text-success'
+            :'bi-exclamation-triangle-fill text-danger'} me-2"></i>
+
+
+            <strong>${message}</strong>
+
+
+            <button class="btn-close" data-bs-dismiss="alert"></button>
+
+
+        </div>
+
+
         `;
-        $('#feeAlertContainer').html(alertHtml);
+
+
+        $('#feeAlertContainer').html(html);
+
+
     }
 
-    // Create Fee Submit
-    $('#createFeeForm').on('submit', function(e) {
-        e.preventDefault();
-        $('#modalAlertError').addClass('d-none').html('');
-        var saveBtn = $('#saveFeeBtn');
-        saveBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Processing...');
 
-        $.post("{{ route('fees.store') }}", $(this).serialize(), function(res) {
-            saveBtn.prop('disabled', false).html('Generate Demand');
-            if (res.success) {
-                $('#createFeeModal').modal('hide');
+
+
+
+
+
+    $('#createFeeForm').submit(function(e){
+
+
+        e.preventDefault();
+
+
+
+        let btn=$('#saveFeeBtn');
+
+
+        btn.prop('disabled',true)
+
+        .html('<span class="spinner-border spinner-border-sm"></span> Processing...');
+
+
+
+        $.post("{{route('fees.store')}}",$(this).serialize())
+
+
+        .done(function(res){
+
+
+            if(res.success){
+
+
+
+                bootstrap.Modal
+                .getInstance(
+                    document.getElementById('createFeeModal')
+                )
+                .hide();
+
+
+
                 $('#createFeeForm')[0].reset();
-                table.ajax.reload(null, false);
-                showAlert(res.message || 'Fee demand generated successfully!');
+
+
+
+                table.ajax.reload(null,false);
+
+
+
+                showAlert(res.message ?? 'Fee demand generated successfully');
+
+
             }
-        }).fail(function(xhr) {
-            saveBtn.prop('disabled', false).html('Generate Demand');
-            var errorMsg = 'Failed to generate fee demand.';
-            if (xhr.responseJSON && xhr.responseJSON.errors) {
-                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
-            } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMsg = xhr.responseJSON.message;
+
+
+        })
+
+
+        .fail(function(xhr){
+
+
+            let msg='Failed to generate fee demand';
+
+
+
+            if(xhr.responseJSON?.errors){
+
+
+                msg=Object.values(xhr.responseJSON.errors)
+                .flat()
+                .join('<br>');
+
+
             }
-            $('#modalAlertError').removeClass('d-none').html(errorMsg);
+
+
+
+            $('#modalAlertError')
+            .removeClass('d-none')
+            .html(msg);
+
+
+
+        })
+
+
+        .always(function(){
+
+
+            btn.prop('disabled',false)
+            .html('Generate Demand');
+
+
         });
+
+
+
     });
 
-    // Edit Payment Click
-    $(document).on('click', '.edit-payment-btn', function() {
-        var id = $(this).data('id');
-        var amount = $(this).data('amount');
-        var paid = $(this).data('paid');
+
+
+
+
+
+
+    $(document).on('click','.edit-payment-btn',function(){
+
+
+
+        let id=$(this).data('id');
+
+        let paid=$(this).data('paid');
+
+        let amount=$(this).data('amount');
+
+
 
         $('#payFeeId').val(id);
-        $('#payAmountInput').val(paid).attr('max', amount);
+
+
+        $('#payAmountInput')
+        .val(paid)
+        .attr('max',amount);
+
+
+
         $('#payTotalLabel').text(amount);
-        $('#paymentModal').modal('show');
+
+
+
+        new bootstrap.Modal(
+            document.getElementById('paymentModal')
+        ).show();
+
+
+
     });
 
-    // Save Payment Submit
-    $('#paymentForm').on('submit', function(e) {
+
+
+
+
+
+
+    $('#paymentForm').submit(function(e){
+
+
         e.preventDefault();
-        var id = $('#payFeeId').val();
-        var paid = $('#payAmountInput').val();
-        var saveBtn = $('#savePayBtn');
-        saveBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Saving...');
+
+
+
+        let amount=parseFloat($('#payAmountInput').val());
+
+        let max=parseFloat($('#payAmountInput').attr('max'));
+
+
+
+        if(amount > max){
+
+
+            alert('Paid amount cannot exceed total fee amount');
+
+
+            return;
+
+
+        }
+
+
+
+
+        let btn=$('#savePayBtn');
+
+
+        btn.prop('disabled',true)
+        .html('Saving...');
+
+
+
 
         $.ajax({
-            url: "/fees/" + id + "/payment",
-            type: 'PUT',
-            data: { paid_amount: paid },
-            success: function(res) {
-                saveBtn.prop('disabled', false).html('Save Payment');
-                if (res.success) {
-                    $('#paymentModal').modal('hide');
-                    table.ajax.reload(null, false);
-                    showAlert(res.message || 'Payment recorded successfully!');
-                }
-            },
-            error: function(xhr) {
-                saveBtn.prop('disabled', false).html('Save Payment');
-                alert(xhr.responseJSON?.message || 'Error recording payment.');
+
+
+            url:"/fees/"+$('#payFeeId').val()+"/payment",
+
+
+            type:"PUT",
+
+
+            data:{
+
+
+                paid_amount:amount
+
+
             }
+
+
+        })
+
+
+        .done(function(res){
+
+
+            if(res.success){
+
+
+                bootstrap.Modal
+                .getInstance(
+                    document.getElementById('paymentModal')
+                )
+                .hide();
+
+
+
+                table.ajax.reload(null,false);
+
+
+
+                showAlert(res.message ?? 'Payment recorded successfully');
+
+
+            }
+
+
+
+        })
+
+
+        .fail(function(xhr){
+
+
+            alert(xhr.responseJSON?.message ?? 'Payment error');
+
+
+        })
+
+
+        .always(function(){
+
+
+            btn.prop('disabled',false)
+            .html('Save Payment');
+
+
         });
+
+
+
     });
 
-    // Delete Fee
-    $(document).on('click', '.delete-fee-btn', function() {
-        var id = $(this).data('id');
-        if (confirm('Delete this fee demand record?')) {
-            $.ajax({
-                url: "/fees/" + id,
-                type: 'DELETE',
-                success: function(res) {
-                    table.ajax.reload(null, false);
-                    showAlert('Fee record deleted successfully.', 'warning');
-                },
-                error: function(xhr) {
-                    alert(xhr.responseJSON?.message || 'Error deleting fee record.');
-                }
-            });
-        }
+
+
+
+
+
+
+
+    $(document).on('click','.delete-fee-btn',function(){
+
+
+        let id=$(this).data('id');
+
+
+
+        if(!confirm('Delete this fee demand record?'))
+            return;
+
+
+
+
+        $.ajax({
+
+
+            url:"/fees/"+id,
+
+
+            type:"DELETE"
+
+
+
+        })
+
+
+        .done(function(){
+
+
+            table.ajax.reload(null,false);
+
+
+            showAlert(
+                'Fee record deleted successfully',
+                'warning'
+            );
+
+
+        })
+
+
+        .fail(function(xhr){
+
+
+            alert(xhr.responseJSON?.message ?? 'Delete error');
+
+
+        });
+
+
+
     });
+
+
+
+
 });
+
 </script>
 @endpush

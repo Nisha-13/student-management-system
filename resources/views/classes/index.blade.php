@@ -8,7 +8,7 @@
     {{-- Classes Table --}}
     <div class="col-lg-8">
         <div class="card card-custom p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                 <div>
                     <h5 class="fw-bold m-0">All Classes</h5>
                     <small class="text-muted">Manage grade levels / classes</small>
@@ -22,10 +22,10 @@
                     <thead class="table-light">
                         <tr>
                             <th>Class Name</th>
-                            <th>Code</th>
+                            <th class="d-none d-sm-table-cell">Code</th>
                             <th class="text-center">Sections</th>
-                            <th class="text-center">Students</th>
-                            <th class="text-center">Subjects</th>
+                            <th class="text-center d-none d-md-table-cell">Students</th>
+                            <th class="text-center d-none d-lg-table-cell">Subjects</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -127,10 +127,10 @@ $(document).ready(function () {
         ajax: { url: "{{ route('admin.classes.index') }}", dataSrc: 'data' },
         columns: [
             { data: 'name', render: function(d) { return '<span class="fw-semibold">' + d + '</span>'; } },
-            { data: 'code' },
+            { data: 'code', className: 'd-none d-sm-table-cell' },
             { data: 'sections_count', className: 'text-center' },
-            { data: 'students_count', className: 'text-center' },
-            { data: 'subjects_count', className: 'text-center' },
+            { data: 'students_count', className: 'text-center d-none d-md-table-cell' },
+            { data: 'subjects_count', className: 'text-center d-none d-lg-table-cell' },
             { data: 'actions', orderable: false, searchable: false, className: 'text-center' },
         ]
     });

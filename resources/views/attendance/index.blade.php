@@ -8,7 +8,7 @@
     <h5 class="fw-bold mb-3"><i class="bi bi-funnel text-primary me-2"></i> Select Class & Date</h5>
 
     <form id="attendanceFilterForm" class="row g-3 align-items-end">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label fw-semibold small text-muted">Class *</label>
             <select id="classFilter" class="form-select" required>
                 <option value="">Select Class</option>
@@ -18,14 +18,14 @@
             </select>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label fw-semibold small text-muted">Section *</label>
             <select id="sectionFilter" class="form-select" required>
                 <option value="">Select Section</option>
             </select>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label fw-semibold small text-muted">Date *</label>
             <div class="input-group">
                 <input type="date" id="dateFilter" class="form-select" value="{{ date('Y-m-d') }}" required>
@@ -36,7 +36,7 @@
 </div>
 
 <div id="attendanceContainer" class="card card-custom p-4 d-none">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
             <h5 class="fw-bold m-0">Student Attendance Sheet</h5>
             <small class="text-muted" id="sheetSubtitle">Class Roster</small>
@@ -51,10 +51,10 @@
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 10%;">Roll #</th>
-                        <th style="width: 25%;">Student Name</th>
-                        <th style="width: 45%;">Attendance Status</th>
-                        <th style="width: 20%;">Remarks</th>
+                        <th>Roll #</th>
+                        <th>Student Name</th>
+                        <th class="attendance-status-group">Attendance Status</th>
+                        <th class="d-none d-sm-table-cell">Remarks</th>
                     </tr>
                 </thead>
                 <tbody id="attendanceTbody">
@@ -136,7 +136,7 @@ $(document).ready(function() {
                                         <input type="hidden" name="attendance[${index}][student_id]" value="${student.student_id}">
                                         <span class="fw-semibold">${student.name}</span>
                                     </td>
-                                    <td>
+                                    <td class="attendance-status-group">
                                         <div class="btn-group" role="group">
                                             <input type="radio" class="btn-check" name="attendance[${index}][status]" id="p_${student.student_id}" value="present" ${student.status === 'present' ? 'checked' : ''}>
                                             <label class="btn btn-outline-success btn-sm" for="p_${student.student_id}">Present</label>
@@ -151,7 +151,7 @@ $(document).ready(function() {
                                             <label class="btn btn-outline-info btn-sm" for="e_${student.student_id}">Excused</label>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-sm-table-cell">
                                         <input type="text" name="attendance[${index}][remarks]" class="form-control form-control-sm" placeholder="Optional remark" value="${student.remarks || ''}">
                                     </td>
                                 </tr>

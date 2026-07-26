@@ -207,6 +207,16 @@
             main.main-content {
                 padding: 1rem;
             }
+
+            /* Fix card header flex wrapping */
+            .card-header-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 0.5rem;
+            }
+            .card-header-flex .btn {
+                align-self: flex-end;
+            }
         }
 
         @media (max-width: 575.98px) {
@@ -224,6 +234,12 @@
                 padding: 3px 6px;
                 font-size: 0.75rem;
             }
+            /* Smaller headings on mobile */
+            h5.fw-bold { font-size: 1rem; }
+            h4.fw-bold { font-size: 1.1rem; }
+            /* Compact card padding */
+            .card-custom.p-4 { padding: 1rem !important; }
+            .card-custom.p-3 { padding: 0.75rem !important; }
         }
 
         /* ========== DATATABLE RESPONSIVE FIXES ========== */
@@ -243,6 +259,14 @@
                 float: none;
                 width: 100%;
             }
+            /* Smaller DataTables controls */
+            div.dataTables_wrapper .dataTables_length select {
+                min-width: 60px;
+            }
+            div.dataTables_wrapper .dataTables_filter input {
+                min-width: 0;
+                width: 100%;
+            }
         }
 
         /* ========== ACCESS URL BANNER ========== */
@@ -260,6 +284,124 @@
         }
         @media (min-width: 992px) {
             .page-title-text { max-width: none; }
+        }
+
+        /* ========== CARD HEADER FLEX UTILITY ========== */
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* ========== ATTENDANCE RESPONSIVE ========== */
+        @media (max-width: 575.98px) {
+            .attendance-status-group .btn-group {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+            }
+            .attendance-status-group .btn-group .btn {
+                border-radius: 6px !important;
+                font-size: 0.7rem;
+                padding: 4px 6px;
+            }
+        }
+
+        /* ========== MARKS TABLE RESPONSIVE ========== */
+        @media (max-width: 767.98px) {
+            .marks-table-responsive .form-control {
+                min-width: 60px;
+                font-size: 0.85rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        /* ========== TIMETABLE RESPONSIVE ========== */
+        @media (max-width: 575.98px) {
+            .badge-period {
+                min-width: auto !important;
+                width: 100%;
+                display: block !important;
+                margin-bottom: 0.5rem !important;
+            }
+        }
+
+        /* ========== REPORT CARD RESPONSIVE ========== */
+        @media (max-width: 767.98px) {
+            .report-card-container {
+                padding: 15px !important;
+                margin: 10px auto !important;
+                border-radius: 8px !important;
+            }
+            .report-header {
+                flex-direction: column !important;
+                text-align: center !important;
+                gap: 1rem;
+            }
+            .report-header .text-end {
+                text-align: center !important;
+            }
+            .grade-badge {
+                font-size: 1.5rem !important;
+                padding: 8px 18px !important;
+            }
+            .header-logo {
+                font-size: 1.8rem !important;
+            }
+            .report-header h2 {
+                font-size: 1.2rem !important;
+            }
+            .signature-script-1 { font-size: 1.4rem !important; }
+            .signature-script-2 { font-size: 1.2rem !important; }
+            .official-seal {
+                width: 55px !important;
+                height: 55px !important;
+                font-size: 0.45rem !important;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .report-card-container {
+                padding: 10px !important;
+                margin: 5px !important;
+            }
+            .no-print .btn {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.75rem;
+            }
+        }
+
+        /* ========== MODAL RESPONSIVE ========== */
+        @media (max-width: 575.98px) {
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            .modal-content {
+                border-radius: 12px;
+            }
+            .modal-header {
+                padding: 0.75rem 1rem;
+            }
+            .modal-body {
+                padding: 0.75rem 1rem;
+            }
+            .modal-footer {
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        /* ========== FORM RESPONSIVE ========== */
+        @media (max-width: 575.98px) {
+            .form-label {
+                font-size: 0.8rem;
+            }
+            .form-control, .form-select {
+                font-size: 0.9rem;
+            }
+            .input-group-text {
+                font-size: 0.85rem;
+            }
         }
     </style>
     @stack('styles')

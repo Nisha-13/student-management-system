@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="card card-custom p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <div>
             <h5 class="fw-bold m-0">All Subjects</h5>
             <small class="text-muted">Manage subjects assigned to each class</small>
@@ -19,7 +19,7 @@
             <thead class="table-light">
                 <tr>
                     <th>Subject Name</th>
-                    <th>Subject Code</th>
+                    <th class="d-none d-sm-table-cell">Subject Code</th>
                     <th>Class</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -112,7 +112,7 @@ $(document).ready(function() {
         ajax: { url: "{{ route('admin.subjects.index') }}", dataSrc: 'data' },
         columns: [
             { data: 'name', render: function(d) { return '<span class="fw-semibold">' + d + '</span>'; } },
-            { data: 'code', render: function(d) { return '<code class="bg-light px-2 py-1 rounded">' + d + '</code>'; } },
+            { data: 'code', render: function(d) { return '<code class="bg-light px-2 py-1 rounded">' + d + '</code>'; }, className: 'd-none d-sm-table-cell' },
             { data: 'class_name' },
             { data: 'actions', orderable: false, searchable: false, className: 'text-center' },
         ]
