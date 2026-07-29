@@ -58,11 +58,20 @@ class TeacherController extends Controller
     {
         $user = null;
         DB::transaction(function () use ($request, &$user) {
+            // Handle avatar upload if present
+            $avatarPath = null;
+            if ($request->hasFile('avatar')) {
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            }
+
+            // Create user WITHOUT email verification (will be verified via email)
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'teacher',
+                'avatar' => $avatarPath,
+                // email_verified_at is NULL by default (not verified)
             ]);
 
             Teacher::create([
@@ -76,10 +85,12 @@ class TeacherController extends Controller
         $accessUrl = null;
         if ($user) {
             try {
+                // Send both portal access link AND email verification
                 $user->notify(new UserPortalAccessNotification());
+                $user->sendEmailVerificationNotification(); // Send verification email
                 session()->flash('email_sent', true);
             } catch (\Throwable $e) {
-                \Log::error('Failed sending teacher portal notification: ' . $e->getMessage());
+                \Log::error('Failed sending teacher notifications: ' . $e->getMessage());
                 session()->flash('email_error', $e->getMessage());
             }
 
@@ -97,12 +108,12 @@ class TeacherController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Teacher created successfully. Portal access link generated.',
+                'message' => 'Teacher created successfully. Verification email sent.',
                 'access_url' => $accessUrl
             ]);
         }
 
-        return redirect()->route('admin.teachers.index')->with('success', 'Teacher created successfully.');
+        return redirect()->route('admin.teachers.index')->with('success', 'Teacher created successfully. Verification email sent.');
     }
 
     /**
@@ -131,9 +142,20 @@ class TeacherController extends Controller
     public function update(UpdateTeacherRequest $request, Teacher $teacher): RedirectResponse|JsonResponse
     {
         DB::transaction(function () use ($request, $teacher) {
+            // Handle avatar upload
+            $avatarPath = $teacher->user->avatar;
+            if ($request->hasFile('avatar')) {
+                // Delete old avatar if exists
+                if ($teacher->user->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($teacher->user->avatar)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($teacher->user->avatar);
+                }
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            }
+
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
+                'avatar' => $avatarPath, // Update avatar in users table
             ];
 
             if ($request->filled('password')) {
@@ -162,6 +184,11 @@ class TeacherController extends Controller
     public function destroy(Teacher $teacher, Request $request): RedirectResponse|JsonResponse
     {
         DB::transaction(function () use ($teacher) {
+            // Delete avatar if exists
+            if ($teacher->user->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($teacher->user->avatar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($teacher->user->avatar);
+            }
+            
             $user = $teacher->user;
             $teacher->delete();
             $user?->delete();

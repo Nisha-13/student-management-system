@@ -93,6 +93,46 @@ class LoginController extends Controller
     }
 
     /**
+     * Show the self-service "Request New Portal Access Link" form.
+     */
+    public function showRequestLinkForm(): View
+    {
+        return view('auth.request-portal-link');
+    }
+
+    /**
+     * Handle the portal link request.
+     *
+     * Security: We always return the same success message whether the
+     * email exists or not — this prevents email enumeration attacks.
+     * Only student/teacher accounts get a link (admins use password).
+     */
+    public function requestPortalLink(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $user = User::where('email', $request->email)
+            ->whereIn('role', ['student', 'teacher'])
+            ->first();
+
+        if ($user) {
+            try {
+                $user->notify(new UserPortalAccessNotification());
+            } catch (\Throwable $e) {
+                \Log::error('Failed sending self-service portal link: ' . $e->getMessage());
+            }
+        }
+
+        // Always redirect with success — never reveal if email exists
+        return back()->with(
+            'success',
+            'If that email is registered, a new portal access link has been sent. Please check your inbox (and spam folder).'
+        );
+    }
+
+    /**
      * Log the user out of the application.
      */
     public function logout(Request $request): RedirectResponse

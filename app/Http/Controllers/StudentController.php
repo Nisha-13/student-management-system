@@ -68,18 +68,23 @@ class StudentController extends Controller
     {
         $user = null;
         DB::transaction(function () use ($request, &$user) {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => 'student',
-            ]);
-
+            // Handle avatar upload FIRST
             $avatarPath = null;
             if ($request->hasFile('avatar')) {
                 $avatarPath = $request->file('avatar')->store('avatars', 'public');
             }
 
+            // Create user WITHOUT email verification (will be verified via email)
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'student',
+                'avatar' => $avatarPath,
+                // email_verified_at is NULL by default (not verified)
+            ]);
+
+            // Create student record with same avatar
             Student::create([
                 'user_id' => $user->id,
                 'school_class_id' => $request->school_class_id,
@@ -96,10 +101,12 @@ class StudentController extends Controller
         $accessUrl = null;
         if ($user) {
             try {
+                // Send both portal access link AND email verification
                 $user->notify(new UserPortalAccessNotification());
+                $user->sendEmailVerificationNotification(); // Send verification email
                 session()->flash('email_sent', true);
             } catch (\Throwable $e) {
-                \Log::error('Failed sending portal notification: ' . $e->getMessage());
+                \Log::error('Failed sending notifications: ' . $e->getMessage());
                 session()->flash('email_error', $e->getMessage());
             }
 
@@ -117,12 +124,12 @@ class StudentController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Student created successfully. Portal access link generated.',
+                'message' => 'Student created successfully. Verification email sent.',
                 'access_url' => $accessUrl
             ]);
         }
 
-        return redirect()->route('students.index')->with('success', 'Student created successfully.');
+        return redirect()->route('students.index')->with('success', 'Student created successfully. Verification email sent.');
     }
 
     /**
@@ -152,9 +159,21 @@ class StudentController extends Controller
     public function update(UpdateStudentRequest $request, Student $student): RedirectResponse|JsonResponse
     {
         DB::transaction(function () use ($request, $student) {
+            // Handle avatar upload
+            $avatarPath = $student->avatar;
+            if ($request->hasFile('avatar')) {
+                // Delete old avatar if exists
+                if ($student->avatar && Storage::disk('public')->exists($student->avatar)) {
+                    Storage::disk('public')->delete($student->avatar);
+                }
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            }
+
+            // Update user record with avatar
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
+                'avatar' => $avatarPath, // Update avatar in users table
             ];
 
             if ($request->filled('password')) {
@@ -163,14 +182,7 @@ class StudentController extends Controller
 
             $student->user->update($userData);
 
-            $avatarPath = $student->avatar;
-            if ($request->hasFile('avatar')) {
-                if ($student->avatar && Storage::disk('public')->exists($student->avatar)) {
-                    Storage::disk('public')->delete($student->avatar);
-                }
-                $avatarPath = $request->file('avatar')->store('avatars', 'public');
-            }
-
+            // Update student record with same avatar
             $student->update([
                 'school_class_id' => $request->school_class_id,
                 'section_id' => $request->section_id,
@@ -179,7 +191,7 @@ class StudentController extends Controller
                 'gender' => $request->gender,
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'avatar' => $avatarPath,
+                'avatar' => $avatarPath, // Update avatar in students table too
             ]);
         });
 
@@ -217,5 +229,31 @@ class StudentController extends Controller
     public function getSections(SchoolClass $schoolClass): JsonResponse
     {
         return response()->json($schoolClass->sections);
+    }
+
+    /**
+     * Debug endpoint to test avatar URLs
+     */
+    public function debugAvatars(Request $request): JsonResponse
+    {
+        $students = Student::with(['user', 'schoolClass', 'section'])
+            ->whereNotNull('avatar')
+            ->limit(3)
+            ->get();
+
+        return response()->json([
+            'app_url' => config('app.url'),
+            'storage_path' => storage_path('app/public'),
+            'public_storage_link' => public_path('storage'),
+            'link_exists' => file_exists(public_path('storage')),
+            'students' => $students->map(function ($student) {
+                return [
+                    'name' => $student->user->name,
+                    'avatar' => $student->avatar,
+                    'avatar_url' => $student->avatar_url,
+                    'file_exists' => file_exists(storage_path('app/public/' . $student->avatar)),
+                ];
+            }),
+        ]);
     }
 }

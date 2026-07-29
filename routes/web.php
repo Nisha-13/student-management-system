@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeeController;
 use App\Http\Controllers\MarkController;
@@ -11,6 +13,8 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TimetableController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // -------------------------
@@ -24,6 +28,16 @@ Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm']);
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
+
+    // Self-service portal link request (for expired links)
+    Route::get('/request-portal-link', [LoginController::class, 'showRequestLinkForm'])->name('portal.request-link.form');
+    Route::post('/request-portal-link', [LoginController::class, 'requestPortalLink'])->name('portal.request-link')->middleware('throttle:5,1');
+
+    // Password Reset Routes (Admin only - Students/Teachers use portal links)
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
 // -------------------------
@@ -34,8 +48,25 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::post('/users/{user}/resend-portal-link', [LoginController::class, 'resendAccessLink'])->name('users.resend-portal-link');
 
+    // -------------------------
+    // Email Verification Routes
+    // -------------------------
+    Route::get('/email/verify', function () {
+        return view('auth.verify-email');
+    })->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+        return redirect()->route(auth()->user()->role . '.dashboard')->with('verified', true);
+    })->middleware('signed')->name('verification.verify');
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Verification link sent!');
+    })->middleware('throttle:6,1')->name('verification.send');
+
     // ----------------------------------------------------------
-    // ADMIN ONLY Routes
+    // ADMIN ONLY Routes (No verification required for admin)
     // ----------------------------------------------------------
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
@@ -58,16 +89,22 @@ Route::middleware('auth')->group(function () {
     });
 
     // ----------------------------------------------------------
-    // ADMIN + TEACHER Routes (Shared Access)
+    // ADMIN + TEACHER Routes (Require Email Verification)
+    // NOTE: This applies to TEACHERS only, not admins
     // ----------------------------------------------------------
     Route::middleware('role:teacher,admin')->group(function () {
 
-        // Teacher Dashboard
-        Route::get('/teacher/dashboard', [DashboardController::class, 'teacher'])->name('teacher.dashboard');
+        // Teacher Dashboard (requires verification for teachers)
+        Route::get('/teacher/dashboard', [DashboardController::class, 'teacher'])
+            ->name('teacher.dashboard')
+            ->middleware('verified');
 
         // AJAX Helpers for dropdowns (used across forms)
         Route::get('/classes/{schoolClass}/sections', [StudentController::class, 'getSections'])->name('classes.sections');
         Route::get('/classes/{schoolClass}/subjects', [MarkController::class, 'getSubjects'])->name('classes.subjects');
+
+        // Debug route (remove in production)
+        Route::get('/debug/avatars', [StudentController::class, 'debugAvatars'])->name('debug.avatars');
 
         // Students CRUD
         Route::resource('students', StudentController::class);
@@ -103,9 +140,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin,teacher,student');
 
     // ----------------------------------------------------------
-    // STUDENT ONLY Routes
+    // STUDENT ONLY Routes (Require Email Verification)
     // ----------------------------------------------------------
-    Route::middleware('role:student')->prefix('student')->name('student.')->group(function () {
+    Route::middleware(['role:student', 'verified'])->prefix('student')->name('student.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'student'])->name('dashboard');
     });
 });

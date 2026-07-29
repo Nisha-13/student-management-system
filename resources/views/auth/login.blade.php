@@ -132,6 +132,9 @@
                         <input type="checkbox" class="form-check-input" id="remember" name="remember">
                         <label class="form-check-label small text-secondary" for="remember">Remember me</label>
                     </div>
+                    <a href="{{ route('password.request') }}" class="small text-decoration-none" style="color:#6366f1;">
+                        Forgot password?
+                    </a>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 rounded-3 shadow-sm">
@@ -141,6 +144,13 @@
         </div>
 
         <div class="bg-light px-4 py-3 border-top text-center">
+            <p class="small text-muted mb-2">
+                <i class="bi bi-link-45deg me-1"></i>
+                Portal link expired?
+                <a href="{{ route('portal.request-link.form') }}" class="text-decoration-none fw-medium" style="color:#6366f1;">
+                    Request a new access link
+                </a>
+            </p>
             <p class="small text-muted mb-0">&copy; {{ date('Y') }} Student Management System. All rights reserved.</p>
         </div>
     </div>
